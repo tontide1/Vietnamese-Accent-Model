@@ -1,0 +1,16 @@
+Roadmap làm Project Machine Learning
+1. Cào dừ liệu từ wiki
+2. Xử lý, EDA dữ liệu
+- Tách từ, chuyển không dấu, chuẩn hoá
+3. Tạo mô hình
+- Viết tay
+	* Sử dụng thuật toán N-gram
+	[https://viblo.asia/p/language-modeling-mo-hinh-ngon-ngu-va-bai-toan-them-dau-cau-trong-tieng-viet-1VgZveV2KAw]
+	
+- Sử dụng thư viện có sẵn
+	* Bi-LSTM, CRF hoặc PhoBERT
+4. Đánh giá mô hình
+- Char/word, trực quan hoá
+
+5. Code Flask hoặc sử dụng streamlit tạo ra website
+[https://vietnameseaccent.com/]

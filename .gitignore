@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Large data files
+viwiki-latest-pages-articles.xml.bz2
+train_tieng_viet.txt
+output_viwiki/
