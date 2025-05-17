@@ -13,22 +13,33 @@ DEFAULT_MODEL_PATH = os.path.join(MODEL_DIR, DEFAULT_MODEL_FILENAME)
 # --- Prediction Functions ---
 def load_model(model_path: str = DEFAULT_MODEL_PATH):
     if not os.path.exists(model_path):
-        print(f"Error: Model file not found at {model_path}")
-        print(f"Please train and save the model first (e.g., by running model_trainer.py) or provide a valid path.")
+        print(f"ERROR: Model file not found at {model_path}")
+        print(f"Please train and save the model first or provide a valid path.")
         return None
     
-    print(f"Loading model from {model_path}...")
+    print(f"Attempting to load model from {model_path}...")
     try:
         with open(model_path, 'rb') as fin:
             model_loaded = pickle.load(fin)
-        print(f"Model loaded successfully. Vocabulary size: {len(model_loaded.vocab)}")
+        # Kiểm tra sơ bộ xem có thuộc tính vocab không, vì các model NLTK thường có
+        if hasattr(model_loaded, 'vocab'):
+            print(f"Model loaded successfully from {model_path}. Vocabulary size: {len(model_loaded.vocab)}")
+        else:
+            print(f"Model loaded from {model_path}, but it does not seem to have a 'vocab' attribute. Type: {type(model_loaded)}")
         return model_loaded
-    except FileNotFoundError:
-        print(f"Error: Model file not found at {model_path}.")
-    except pickle.UnpicklingError:
-        print(f"Error: Could not unpickle model from {model_path}. File might be corrupted or not a pickle file.")
+    except FileNotFoundError: # Để chắc chắn, dù đã kiểm tra ở trên
+        print(f"CRITICAL ERROR: Model file not found during open or pickle.load operation: {model_path}.")
+    except pickle.UnpicklingError as e_pickle:
+        print(f"CRITICAL ERROR: Could not unpickle model from {model_path}. File might be corrupted or not a NLTK pickle file. Details: {e_pickle}")
+    except AttributeError as e_attr:
+        print(f"CRITICAL ERROR: AttributeError during unpickling model from {model_path}. This might indicate a mismatch in class definitions (e.g., model saved with a different NLTK version or custom class not found). Details: {e_attr}")
+    except ImportError as e_imp:
+        print(f"CRITICAL ERROR: ImportError during unpickling model from {model_path}. A custom class definition might be missing. Details: {e_imp}")
     except Exception as e:
-        print(f"An unexpected error occurred while loading the model: {e}")
+        print(f"CRITICAL ERROR: An unexpected error occurred while loading the model from {model_path}. Details: {e}")
+        # Bạn có thể bỏ comment dòng dưới để xem traceback chi tiết hơn nếu cần gỡ lỗi sâu
+        # import traceback
+        # traceback.print_exc()
     return None
 
 _detokenizer = TreebankWordDetokenizer()
@@ -63,8 +74,8 @@ def beam_search_predict_accents(text_no_accents: str, model, k: int = 3,
                     context = seq_words[-(model.order - 1):] if model.order > 1 else [] 
                     try:
                         score_addition = model.logscore(next_accented_word, tuple(context))
-                    except Exception as e: # Could be due to OOV in context or word itself
-                        print(f"Logscore error for '{next_accented_word}' with context {context}: {e}. Assigning low score.")
+                    except Exception as e: 
+                        # print(f"Logscore error for '{next_accented_word}' with context {context}: {e}. Assigning low score.")
                         score_addition = -float('inf') 
                         
                     new_seq_words = seq_words + [next_accented_word]
@@ -87,12 +98,15 @@ if __name__ == '__main__':
     try:
         import nltk
         nltk.data.find('tokenizers/punkt')
-    except nltk.downloader.DownloadError:
-        print("NLTK 'punkt' resource not found. Please download it first by running: import nltk; nltk.download('punkt')")
-        exit()
+    # except nltk.downloader.DownloadError: # Commenting out due to linter error, not essential for current debugging
+    #     print("NLTK 'punkt' resource not found. Please download it first by running: import nltk; nltk.download('punkt')")
+    #     exit()
     except ImportError:
         print("NLTK library not found. Please install it: pip install nltk")
         exit()
+    except Exception as e_nltk_check: # Catch any other NLTK check error
+        print(f"An error occurred during NLTK check: {e_nltk_check}")
+        # Potentially exit or continue with caution depending on severity
 
     print("\nStep 1: Checking data (like vn_syllables.txt) availability...")
     if not check_data_exists():
