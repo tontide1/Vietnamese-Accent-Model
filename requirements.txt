@@ -1,0 +1,6 @@
+dill
+nltk==3.5
+tqdm
+requests
+matplotlib
+ipykernel
