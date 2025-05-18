@@ -128,7 +128,7 @@ def load_and_split_corpus(data_extract_path: str = TRAIN_EXTRACT_PATH, test_size
     raw_sentences_with_accent = re.split(r'[.?!]\s+', full_data_string)
 
     # GIỚI HẠN SỐ LƯỢNG CÂU ĐỂ TRÁNH MemoryError
-    MAX_PROCESS_SENTENCES = 100 # Bạn có thể điều chỉnh con số này
+    MAX_PROCESS_SENTENCES = 1000 # Bạn có thể điều chỉnh con số này
     if len(raw_sentences_with_accent) > MAX_PROCESS_SENTENCES:
         print(f"CẢNH BÁO: Giới hạn xử lý {MAX_PROCESS_SENTENCES} câu đầu tiên trên tổng số {len(raw_sentences_with_accent)} câu để tiết kiệm bộ nhớ.")
         raw_sentences_with_accent = raw_sentences_with_accent[:MAX_PROCESS_SENTENCES]

@@ -45,10 +45,10 @@ RANDOM_SEED = 42
 BEAM_K = 3
 
 # --- RAM Management for Model Loading by Workers (KHÔI PHỤC) ---
-TARGET_RAM_FOR_MODELS_GB = 24.0 # Mục tiêu 24GB cho các model của worker (theo yêu cầu user)
+TARGET_RAM_FOR_MODELS_GB = 24 # Mục tiêu 24GB cho các model của worker (theo yêu cầu user)
 ASSUMED_MODEL_SIZE_GB = 0.2  # Đặt lại thành 0.2 GB (200MB) cho model 150MB
-# ABSOLUTE_MAX_WORKERS = os.cpu_count() or 8     # Giới hạn cứng số worker, ví dụ bằng số core CPU hoặc một giá trị an toàn (8)
-ABSOLUTE_MAX_WORKERS = 4 
+ABSOLUTE_MAX_WORKERS = 8     # Giới hạn cứng số worker, ví dụ bằng số core CPU hoặc một giá trị an toàn (8)
+# ABSOLUTE_MAX_WORKERS = 4 
 
 _detokenizer = TreebankWordDetokenizer()
 
