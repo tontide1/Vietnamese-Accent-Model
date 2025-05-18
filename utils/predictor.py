@@ -6,11 +6,8 @@ from utils.utils import gen_accents_word # For beam_search thuật toán
 from utils.data_loader import SYLLABLES_PATH, check_data_exists 
 from utils.model_trainer import MODEL_DIR, DEFAULT_MODEL_FILENAME
 
-# --- Configuration ---
-# MODEL_DIR and DEFAULT_MODEL_FILENAME are imported from model_trainer
 DEFAULT_MODEL_PATH = os.path.join(MODEL_DIR, DEFAULT_MODEL_FILENAME)
 
-# --- Prediction Functions ---
 def load_model(model_path: str = DEFAULT_MODEL_PATH):
     if not os.path.exists(model_path):
         print(f"ERROR: Model file not found at {model_path}")
@@ -37,26 +34,15 @@ def load_model(model_path: str = DEFAULT_MODEL_PATH):
         print(f"CRITICAL ERROR: ImportError during unpickling model from {model_path}. A custom class definition might be missing. Details: {e_imp}")
     except Exception as e:
         print(f"CRITICAL ERROR: An unexpected error occurred while loading the model from {model_path}. Details: {e}")
-        # Bạn có thể bỏ comment dòng dưới để xem traceback chi tiết hơn nếu cần gỡ lỗi sâu
-        # import traceback
-        # traceback.print_exc()
     return None
 
 _detokenizer = TreebankWordDetokenizer()
 
+
+# cài đặt beam_search thuật toán
 def beam_search_predict_accents(text_no_accents: str, model, k: int = 3, 
                                 syllables_file: str = SYLLABLES_PATH, 
                                 detokenizer=_detokenizer) -> list[tuple[str, float]]:
-    """
-    Predicts accents for a sentence using beam search.
-
-    :param text_no_accents: Input sentence string without accents.
-    :param model: Trained NLTK language model.
-    :param k: Beam width.
-    :param syllables_file: Path to the Vietnamese syllables file for gen_accents_word.
-    :param detokenizer: NLTK detokenizer instance.
-    :return: A list of (sentence_with_accents, log_score) tuples, sorted by score.
-    """
     words = text_no_accents.lower().split()
     sequences = [] # Stores list of ([word_sequence], score)
 

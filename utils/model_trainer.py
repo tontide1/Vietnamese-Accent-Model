@@ -50,7 +50,7 @@ def save_model(model,
 if __name__ == '__main__':
     print("Running model_trainer.py directly...")
 
-    # Ensure NLTK 'punkt' is downloaded (usually done once manually or in setup)
+    #1.  kiểm tra xem nltk đã được cài punkt chưa
     try:
         import nltk
         nltk.data.find('tokenizers/punkt')
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         print("NLTK library not found. Please install it: pip install nltk")
         exit()
 
-    # 2. Download and prepare data
+    # 2. down dữ liệu 
     print("\nStep 1: Downloading and preparing data...")
     data_loader.download_and_prepare_data()
 

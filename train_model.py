@@ -49,7 +49,6 @@ def main():
 
     selected_model_class = MODEL_CLASSES.get(args.model_type, KneserNeyInterpolated)
 
-    # --- Action: Check Data ---
     data_ready = False
     if args.action == "check_data":
         print("\n=== Action: Check Data Existence ===")
@@ -70,7 +69,6 @@ def main():
             print("You can try running with --action check_data for more details or manually place the files.")
             return # Exit if data is not found for training
 
-    # --- Action: Train Model ---
     if args.action == "train":
         if not data_ready:
             print("\nCannot proceed with training: Required data is not available. Please run --action check_data or ensure data is present.")

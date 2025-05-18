@@ -7,10 +7,7 @@ import os
 VN_SYLLABLES_FILE_PATH = "data/vn_syllables.txt"
 
 def tokenize(doc: str) -> list[str]:
-    """
-    Tokenizes a document, converts to lowercase, removes punctuation (except '_'),
-    and filters out empty tokens.
-    """
+
     tokens = word_tokenize(doc.lower())
     # Allow underscore, remove other punctuation
     table = str.maketrans('', '', string.punctuation.replace("_", ""))
@@ -19,10 +16,6 @@ def tokenize(doc: str) -> list[str]:
     return tokens
 
 def remove_vn_accent(word: str) -> str:
-    """
-    Removes Vietnamese accents from a word.
-    Converts the word to lowercase before processing.
-    """
     word = word.lower()
     word = re.sub(r'[áàảãạăắằẳẵặâấầẩẫậ]', 'a', word)
     word = re.sub(r'[éèẻẽẹêếềểễệ]', 'e', word)
@@ -35,9 +28,7 @@ def remove_vn_accent(word: str) -> str:
 
 def gen_accents_word(word: str, syllables_path: str = VN_SYLLABLES_FILE_PATH) -> set[str]:
     """
-    Generates a set of possible Vietnamese words with accents for a given word
-    without accents (or with accents, it will normalize first).
-    Requires the 'vn_syllables.txt' file specified by syllables_path.
+    Sinh  văn bản tự động với file vn_syllables.txt
     """
     normalized_input_word = word.lower()
     word_no_accent = remove_vn_accent(normalized_input_word)
@@ -46,7 +37,6 @@ def gen_accents_word(word: str, syllables_path: str = VN_SYLLABLES_FILE_PATH) ->
     if not os.path.exists(syllables_path):
         print(f"Warning: Syllables file not found at {syllables_path}. "
               f"Accent generation will be limited to the input word: '{word}'.")
-        # Optionally, add the purely unaccented version if different
         if word_no_accent != normalized_input_word:
             all_accent_word.add(word_no_accent)
         return all_accent_word
@@ -63,7 +53,6 @@ def gen_accents_word(word: str, syllables_path: str = VN_SYLLABLES_FILE_PATH) ->
     return all_accent_word
 
 if __name__ == '__main__':
-    # Example Usage (for testing utils.py directly)
     print("Tokenize example:")
     print(tokenize("Đây_là một câu, ví dụ."))
 
@@ -73,7 +62,6 @@ if __name__ == '__main__':
 
     print("\nGenerate accents example (make sure 'data/vn_syllables.txt' exists or is created):")
     
-    # Create a dummy data directory and vn_syllables.txt for testing if they don't exist
     test_data_dir = "data"
     test_syllables_file = os.path.join(test_data_dir, "vn_syllables.txt") # Consistent with VN_SYLLABLES_FILE_PATH
 

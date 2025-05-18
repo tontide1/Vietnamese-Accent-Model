@@ -80,7 +80,8 @@ def load_corpus(data_extract_path: str = TRAIN_EXTRACT_PATH) -> list[list[str]]:
     print(f"Corpus created with {len(corpus)} tokenized sentences.")
     return corpus
 
-# Hàm phụ trợ cho multiprocessing, cần được định nghĩa ở top-level
+# Hàm tận dụng multiprocessing để xử lý nhiều câu cùng lúc
+# cải thiện tốc xử lý cho các tác vụ nặng như tokenize
 def _process_single_sentence_for_splitting(sent_accented: str):
     if sent_accented.strip():
         temp_tokenized_for_unaccenting = tokenize(sent_accented)
@@ -95,12 +96,6 @@ def load_and_split_corpus(data_extract_path: str = TRAIN_EXTRACT_PATH, test_size
     """
     Load dữ liệu, tạo phiên bản không dấu, tokenize câu có dấu,
     và chia thành tập huấn luyện và tập kiểm thử.
-
-    Returns:
-        tuple: (train_corpus, test_set)
-        train_corpus (list[list[str]]): Danh sách các câu có dấu đã tokenize cho huấn luyện.
-        test_set (list[tuple[str, list[str]]]): Danh sách các tuple 
-                                                (câu không dấu dạng chuỗi, câu có dấu đã tokenize) cho kiểm thử.
     """
     if not os.path.exists(data_extract_path):
         print(f"Error: Training data path not found: {data_extract_path}")
@@ -128,24 +123,17 @@ def load_and_split_corpus(data_extract_path: str = TRAIN_EXTRACT_PATH, test_size
     raw_sentences_with_accent = re.split(r'[.?!]\s+', full_data_string)
 
     # GIỚI HẠN SỐ LƯỢNG CÂU ĐỂ TRÁNH MemoryError
-    MAX_PROCESS_SENTENCES = 1000 # Bạn có thể điều chỉnh con số này
+    MAX_PROCESS_SENTENCES = 1000
     if len(raw_sentences_with_accent) > MAX_PROCESS_SENTENCES:
         print(f"CẢNH BÁO: Giới hạn xử lý {MAX_PROCESS_SENTENCES} câu đầu tiên trên tổng số {len(raw_sentences_with_accent)} câu để tiết kiệm bộ nhớ.")
         raw_sentences_with_accent = raw_sentences_with_accent[:MAX_PROCESS_SENTENCES]
     
     print(f"Processing {len(raw_sentences_with_accent)} raw sentences for splitting using multiprocessing...")
     
-    # Sử dụng multiprocessing Pool
-    # Mặc định Pool() sẽ sử dụng số lượng core CPU có sẵn (os.cpu_count())
     with mp.Pool() as pool:
-        # Sử dụng imap để có thể dùng tqdm, và filter None results
-        # chunksize có thể giúp tăng hiệu suất cho list rất lớn
-        # Chọn chunksize dựa trên thực nghiệm, ví dụ len(data) // (num_cores * 4)
         num_cores = os.cpu_count() or 1 # Đảm bảo num_cores ít nhất là 1
         chunk_size = max(1, len(raw_sentences_with_accent) // (num_cores * 4))
         
-        # Bọc list đầu vào của pool.imap với tqdm
-        # pool.imap sẽ xử lý lười biếng (lazy evaluation)
         results_iterator = pool.imap(_process_single_sentence_for_splitting, 
                                      tqdm(raw_sentences_with_accent, desc="Generating unaccented and tokenizing (parallel)"),
                                      chunksize=chunk_size)
